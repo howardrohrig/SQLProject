@@ -1,0 +1,1050 @@
+SQL> 
+SQL> --Howard Rohrig
+SQL> --INSY 3304 - 02
+SQL> --Project 2
+SQL> 
+SQL> --PART 1 Drop, Create and Describe Tables
+SQL> --Drop table if it exists
+SQL> 
+SQL> 
+SQL> DROP TABLE RentalDetail_htr ;
+
+Table dropped.
+
+SQL> DROP TABLE Rental_htr ;
+
+Table dropped.
+
+SQL> DROP TABLE Customer_htr ;
+
+Table dropped.
+
+SQL> DROP TABLE Clerk_htr ;
+
+Table dropped.
+
+SQL> DROP TABLE Disk_htr ;
+
+Table dropped.
+
+SQL> DROP TABLE Format_htr ;
+
+Table dropped.
+
+SQL> DROP TABLE Title_htr ;
+
+Table dropped.
+
+SQL> DROP TABLE Rating_htr ;
+
+Table dropped.
+
+SQL> DROP TABLE Genre_htr ;
+
+Table dropped.
+
+SQL> DROP TABLE Fee_htr ;
+
+Table dropped.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> CREATE TABLE Clerk_htr(
+  2  	     ClerkID	     NUMBER(3,0) not null,
+  3  	     ClerkFName      VARCHAR(20) not null,
+  4  	     ClerkLName      VARCHAR(20) not null,
+  5  	     PRIMARY KEY(ClerkID)
+  6  	     );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE Customer_htr(
+  2  	     CustID	     NUMBER(4,0) not null,
+  3  	     CustFName	     VARCHAR(20) not null,
+  4  	     CustLName	     VARCHAR(20) not null,
+  5  	     CustPhone	     CHAR(10),
+  6  	     PRIMARY KEY(CustID)
+  7  	     );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE Rental_htr(
+  2  	     RentalID	     NUMBER(5,0) not null,
+  3  	     RentalDate      DATE not null,
+  4  	     CustID	     NUMBER(4,0) not null,
+  5  	     ClerkID	     NUMBER(3,0) not null,
+  6  	     PRIMARY KEY(RentalID),
+  7  	     FOREIGN KEY(CustID)
+  8  			     REFERENCES Customer_htr(CustID),
+  9  	     FOREIGN KEY(ClerkID)
+ 10  			     REFERENCES Clerk_htr(ClerkID)
+ 11  	     );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE Fee_htr(
+  2  	     FeeCode CHAR(1),
+  3  	     FeeAmt  NUMBER(3,2),
+  4  	     PRIMARY KEY(FeeCode)
+  5  	     );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE Genre_htr(
+  2  	     GenreID	     VARCHAR(2) not null,
+  3  	     GenreDesc	     VARCHAR(15) not null,
+  4  	     PRIMARY KEY(GenreID)
+  5  	     );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE Rating_htr(
+  2  	     RatingID	     VARCHAR(6) not null,
+  3  	     RatingDesc      VARCHAR(30) not null,
+  4  	     PRIMARY KEY(RatingID)
+  5  	     );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE Title_htr(
+  2  	     TitleID NUMBER(4,0) not null,
+  3  	     Title   VARCHAR(40) not null,
+  4  	     RatingID	     VARCHAR(6) not null,
+  5  	     GenreID VARCHAR(2) not null,
+  6  	     PRIMARY KEY(TitleID),
+  7  	     FOREIGN KEY(RatingID)
+  8  			     REFERENCES Rating_htr(RatingID),
+  9  	     FOREIGN KEY(GenreID)
+ 10  			     REFERENCES Genre_htr(GenreID)
+ 11  	     );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE Format_htr(
+  2  	     FormatCode      CHAR(1) not null,
+  3  	     FormatDesc      VARCHAR(10) not null,
+  4  	     PRIMARY KEY(FormatCode)
+  5  	     );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE Disk_htr(
+  2  	     DiskID	     NUMBER(4,0) not null,
+  3  	     TitleID	     NUMBER(4,0) not null,
+  4  	     FormatCode      CHAR(1) not null,
+  5  	     PRIMARY KEY(DiskID),
+  6  	     FOREIGN KEY(TitleID)
+  7  			     REFERENCES Title_htr(TitleID),
+  8  	     FOREIGN KEY(FormatCode)
+  9  			     REFERENCES Format_htr(FormatCode)
+ 10  	     );
+
+Table created.
+
+SQL> 
+SQL> CREATE TABLE RentalDetail_htr(
+  2  	     RentalID	     NUMBER(5,0) not null,
+  3  	     DiskID  NUMBER(4,0) not null,
+  4  	     FeeCode CHAR(1) not null,
+  5  	     CONSTRAINT RentalDetailPK
+  6  			     PRIMARY KEY(DiskID,RentalID),
+  7  	     FOREIGN KEY(FeeCode)
+  8  			     REFERENCES      Fee_htr(FeeCode)
+  9  	     );
+
+Table created.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> DESCRIBE	     Clerk_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ CLERKID                                   NOT NULL NUMBER(3)
+ CLERKFNAME                                NOT NULL VARCHAR2(20)
+ CLERKLNAME                                NOT NULL VARCHAR2(20)
+
+SQL> DESCRIBE	     Customer_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ CUSTID                                    NOT NULL NUMBER(4)
+ CUSTFNAME                                 NOT NULL VARCHAR2(20)
+ CUSTLNAME                                 NOT NULL VARCHAR2(20)
+ CUSTPHONE                                          CHAR(10)
+
+SQL> DESCRIBE	     Rental_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ RENTALID                                  NOT NULL NUMBER(5)
+ RENTALDATE                                NOT NULL DATE
+ CUSTID                                    NOT NULL NUMBER(4)
+ CLERKID                                   NOT NULL NUMBER(3)
+
+SQL> DESCRIBE	     Fee_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ FEECODE                                   NOT NULL CHAR(1)
+ FEEAMT                                             NUMBER(3,2)
+
+SQL> DESCRIBE	     Genre_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ GENREID                                   NOT NULL VARCHAR2(2)
+ GENREDESC                                 NOT NULL VARCHAR2(15)
+
+SQL> DESCRIBE	     Rating_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ RATINGID                                  NOT NULL VARCHAR2(6)
+ RATINGDESC                                NOT NULL VARCHAR2(30)
+
+SQL> DESCRIBE	     Title_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ TITLEID                                   NOT NULL NUMBER(4)
+ TITLE                                     NOT NULL VARCHAR2(40)
+ RATINGID                                  NOT NULL VARCHAR2(6)
+ GENREID                                   NOT NULL VARCHAR2(2)
+
+SQL> DESCRIBE	     Format_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ FORMATCODE                                NOT NULL CHAR(1)
+ FORMATDESC                                NOT NULL VARCHAR2(10)
+
+SQL> DESCRIBE	     Disk_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ DISKID                                    NOT NULL NUMBER(4)
+ TITLEID                                   NOT NULL NUMBER(4)
+ FORMATCODE                                NOT NULL CHAR(1)
+
+SQL> DESCRIBE	     RentalDetail_htr ;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ RENTALID                                  NOT NULL NUMBER(5)
+ DISKID                                    NOT NULL NUMBER(4)
+ FEECODE                                   NOT NULL CHAR(1)
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> --Part 2 Inserting data and using Select
+SQL> 
+SQL> INSERT INTO Clerk_htr VALUES (15,'Mary','Jones');
+
+1 row created.
+
+SQL> INSERT INTO Clerk_htr VALUES (21,'Mark','White');
+
+1 row created.
+
+SQL> INSERT INTO Clerk_htr VALUES (30,'Renee','Smith');
+
+1 row created.
+
+SQL> INSERT INTO Clerk_htr VALUES (12,'Tim','Shore');
+
+1 row created.
+
+SQL> INSERT INTO Clerk_htr VALUES (42,'Nicole','Walker');
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Customer_htr VALUES (23,'Jean','Mackey','9725551143');
+
+1 row created.
+
+SQL> INSERT INTO Customer_htr VALUES (102,'Jack','Hughes','2145552014');
+
+1 row created.
+
+SQL> INSERT INTO Customer_htr VALUES (154,'Alicia','Moore','8175551919');
+
+1 row created.
+
+SQL> INSERT INTO Customer_htr VALUES (83,'Carrie','Brown',Null);
+
+1 row created.
+
+SQL> INSERT INTO Customer_htr VALUES (53,'Ashleigh','Hayes','9725550628');
+
+1 row created.
+
+SQL> INSERT INTO Customer_htr VALUES (72,'Shane','Wesley','8175550112');
+
+1 row created.
+
+SQL> INSERT INTO Customer_htr VALUES (68,'Anthony','Smith',Null);
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Rental_htr VALUES (1,'02-SEP-2017',23,15);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (2,'02-SEP-2017',102,15);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (3,'02-SEP-2017',154,21);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (4,'03-SEP-2017',83,30);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (5,'03-SEP-2017',23,15);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (6,'04-SEP-2017',83,12);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (7,'04-SEP-2017',154,15);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (8,'05-SEP-2017',53,12);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (9,'05-SEP-2017',68,15);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (10,'05-SEP-2017',23,21);
+
+1 row created.
+
+SQL> INSERT INTO Rental_htr VALUES (11,'05-SEP-2017',72,42);
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Fee_htr VALUES ('A',3);
+
+1 row created.
+
+SQL> INSERT INTO Fee_htr VALUES ('B',2);
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Genre_htr VALUES ('AC','Action');
+
+1 row created.
+
+SQL> INSERT INTO Genre_htr VALUES ('CL','Classics');
+
+1 row created.
+
+SQL> INSERT INTO Genre_htr VALUES ('FM','Family');
+
+1 row created.
+
+SQL> INSERT INTO Genre_htr VALUES ('HR','Horror');
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Rating_htr VALUES ('R','Restricted Under 17');
+
+1 row created.
+
+SQL> INSERT INTO Rating_htr VALUES ('PG-13','Inappropriate Under 13');
+
+1 row created.
+
+SQL> INSERT INTO Rating_htr VALUES ('PG','Parental Guidance');
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Title_htr VALUES (12,'Casa Blanca','PG','CL');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (29,'Despicable Me 2','PG','FM');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (35,'Minions','PG','FM');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (42,'Frozen','PG','FM');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (58,'The Specialist','R','AC');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (76,'Avengers: Infinity War','PG-13','AC');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (92,'Hacksaw Ridge','R','AC');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (119,'Insurgent','PG-13','AC');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (159,'Boss Baby','PG','FM');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (218,'Gone With The Wind','PG','CL');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (230,'Lone Survivor','R','AC');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (240,'It','R','HR');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (245,'Moana','PG','FM');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (296,'The Hurt Locker','R','AC');
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Format_htr VALUES ('D','DVD');
+
+1 row created.
+
+SQL> INSERT INTO Format_htr VALUES ('B','BLU-RAY');
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Disk_htr VALUES (86,58,'B');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (89,12,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (96,29,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (97,29,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (152,42,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (153,42,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (191,76,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (202,159,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (203,159,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (215,92,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (216,92,'B');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (259,119,'B');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (260,119,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (299,35,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (301,230,'B');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (376,245,'B');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (381,218,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (402,240,'B');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (421,296,'D');
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO RentalDetail_htr VALUES (1,191,'B');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (1,215,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (2,259,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (3,89,'B');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (3,96,'B');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (3,152,'B');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (4,86,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (5,260,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (6,301,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (7,153,'B');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (7,376,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (8,202,'B');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (8,402,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (9,216,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (9,381,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (10,97,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (10,203,'B');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (11,299,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (11,376,'B');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (11,421,'A');
+
+1 row created.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> SELECT * FROM Clerk_htr
+  2  	     ORDER BY ClerkID;
+
+   CLERKID CLERKFNAME           CLERKLNAME                                      
+---------- -------------------- --------------------                            
+        12 Tim                  Shore                                           
+        15 Mary                 Jones                                           
+        21 Mark                 White                                           
+        30 Renee                Smith                                           
+        42 Nicole               Walker                                          
+
+SQL> SELECT * FROM Customer_htr
+  2  	     ORDER BY CustID;
+
+    CUSTID CUSTFNAME            CUSTLNAME            CUSTPHONE                  
+---------- -------------------- -------------------- ----------                 
+        23 Jean                 Mackey               9725551143                 
+        53 Ashleigh             Hayes                9725550628                 
+        68 Anthony              Smith                                           
+        72 Shane                Wesley               8175550112                 
+        83 Carrie               Brown                                           
+       102 Jack                 Hughes               2145552014                 
+       154 Alicia               Moore                8175551919                 
+
+7 rows selected.
+
+SQL> SELECT * FROM Rental_htr
+  2  	     ORDER BY RentalID;
+
+  RENTALID RENTALDAT     CUSTID    CLERKID                                      
+---------- --------- ---------- ----------                                      
+         1 02-SEP-17         23         15                                      
+         2 02-SEP-17        102         15                                      
+         3 02-SEP-17        154         21                                      
+         4 03-SEP-17         83         30                                      
+         5 03-SEP-17         23         15                                      
+         6 04-SEP-17         83         12                                      
+         7 04-SEP-17        154         15                                      
+         8 05-SEP-17         53         12                                      
+         9 05-SEP-17         68         15                                      
+        10 05-SEP-17         23         21                                      
+        11 05-SEP-17         72         42                                      
+
+11 rows selected.
+
+SQL> SELECT * FROM Fee_htr;
+
+F     FEEAMT                                                                    
+- ----------                                                                    
+A          3                                                                    
+B          2                                                                    
+
+SQL> SELECT * FROM Genre_htr;
+
+GE GENREDESC                                                                    
+-- ---------------                                                              
+AC Action                                                                       
+CL Classics                                                                     
+FM Family                                                                       
+HR Horror                                                                       
+
+SQL> SELECT * FROM Rating_htr;
+
+RATING RATINGDESC                                                               
+------ ------------------------------                                           
+R      Restricted Under 17                                                      
+PG-13  Inappropriate Under 13                                                   
+PG     Parental Guidance                                                        
+
+SQL> SELECT * FROM Title_htr
+  2  	     ORDER BY TitleID;
+
+   TITLEID TITLE                                    RATING GE                   
+---------- ---------------------------------------- ------ --                   
+        12 Casa Blanca                              PG     CL                   
+        29 Despicable Me 2                          PG     FM                   
+        35 Minions                                  PG     FM                   
+        42 Frozen                                   PG     FM                   
+        58 The Specialist                           R      AC                   
+        76 Avengers: Infinity War                   PG-13  AC                   
+        92 Hacksaw Ridge                            R      AC                   
+       119 Insurgent                                PG-13  AC                   
+       159 Boss Baby                                PG     FM                   
+       218 Gone With The Wind                       PG     CL                   
+       230 Lone Survivor                            R      AC                   
+
+   TITLEID TITLE                                    RATING GE                   
+---------- ---------------------------------------- ------ --                   
+       240 It                                       R      HR                   
+       245 Moana                                    PG     FM                   
+       296 The Hurt Locker                          R      AC                   
+
+14 rows selected.
+
+SQL> SELECT * FROM Format_htr;
+
+F FORMATDESC                                                                    
+- ----------                                                                    
+D DVD                                                                           
+B BLU-RAY                                                                       
+
+SQL> SELECT * FROM Disk_htr
+  2  	     ORDER BY DiskID;
+
+    DISKID    TITLEID F                                                         
+---------- ---------- -                                                         
+        86         58 B                                                         
+        89         12 D                                                         
+        96         29 D                                                         
+        97         29 D                                                         
+       152         42 D                                                         
+       153         42 D                                                         
+       191         76 D                                                         
+       202        159 D                                                         
+       203        159 D                                                         
+       215         92 D                                                         
+       216         92 B                                                         
+
+    DISKID    TITLEID F                                                         
+---------- ---------- -                                                         
+       259        119 B                                                         
+       260        119 D                                                         
+       299         35 D                                                         
+       301        230 B                                                         
+       376        245 B                                                         
+       381        218 D                                                         
+       402        240 B                                                         
+       421        296 D                                                         
+
+19 rows selected.
+
+SQL> SELECT * FROM RentalDetail_htr
+  2  	     ORDER BY RentalID;
+
+  RENTALID     DISKID F                                                         
+---------- ---------- -                                                         
+         1        191 B                                                         
+         1        215 A                                                         
+         2        259 A                                                         
+         3         89 B                                                         
+         3         96 B                                                         
+         3        152 B                                                         
+         4         86 A                                                         
+         5        260 A                                                         
+         6        301 A                                                         
+         7        153 B                                                         
+         7        376 A                                                         
+
+  RENTALID     DISKID F                                                         
+---------- ---------- -                                                         
+         8        202 B                                                         
+         8        402 A                                                         
+         9        216 A                                                         
+         9        381 A                                                         
+        10         97 A                                                         
+        10        203 B                                                         
+        11        299 A                                                         
+        11        376 B                                                         
+        11        421 A                                                         
+
+20 rows selected.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> --PART 3 Modify data in the table
+SQL> 
+SQL> UPDATE Customer_htr
+  2  SET CustFName = 'Kerry'
+  3  WHERE CustID = 83;
+
+1 row updated.
+
+SQL> 
+SQL> UPDATE Customer_htr
+  2  SET CustPhone = '2146881234'
+  3  WHERE CustID = 23;
+
+1 row updated.
+
+SQL> 
+SQL> INSERT INTO Customer_htr VALUES (100,'Amanda','Green',Null);
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Genre_htr VALUES ('DR','Drama');
+
+1 row created.
+
+SQL> INSERT INTO Title_htr VALUES (279,'Hidalgo', 'PG-13','DR');
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Disk_htr VALUES (327,92,'D');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (382,119,'B');
+
+1 row created.
+
+SQL> INSERT INTO Disk_htr VALUES (406,29,'D');
+
+1 row created.
+
+SQL> 
+SQL> UPDATE RentalDetail_htr
+  2  SET FeeCode = 'B'
+  3  WHERE RentalID = 1 AND DiskID = 215;
+
+1 row updated.
+
+SQL> 
+SQL> INSERT INTO RentalDetail_htr VALUES (12,376,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (12,406,'B');
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO RentalDetail_htr VALUES (13,382,'A');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (13,215,'B');
+
+1 row created.
+
+SQL> INSERT INTO RentalDetail_htr VALUES (13,327,'A');
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Rating_htr VALUES ('NR','Not Rated');
+
+1 row created.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> --PART 4 Execute select statement
+SQL> 
+SQL> SELECT * FROM Clerk_htr
+  2  	     ORDER BY ClerkID;
+
+   CLERKID CLERKFNAME           CLERKLNAME                                      
+---------- -------------------- --------------------                            
+        12 Tim                  Shore                                           
+        15 Mary                 Jones                                           
+        21 Mark                 White                                           
+        30 Renee                Smith                                           
+        42 Nicole               Walker                                          
+
+SQL> SELECT * FROM Customer_htr
+  2  	     ORDER BY CustID;
+
+    CUSTID CUSTFNAME            CUSTLNAME            CUSTPHONE                  
+---------- -------------------- -------------------- ----------                 
+        23 Jean                 Mackey               2146881234                 
+        53 Ashleigh             Hayes                9725550628                 
+        68 Anthony              Smith                                           
+        72 Shane                Wesley               8175550112                 
+        83 Kerry                Brown                                           
+       100 Amanda               Green                                           
+       102 Jack                 Hughes               2145552014                 
+       154 Alicia               Moore                8175551919                 
+
+8 rows selected.
+
+SQL> SELECT * FROM Rental_htr
+  2  	     ORDER BY RentalID;
+
+  RENTALID RENTALDAT     CUSTID    CLERKID                                      
+---------- --------- ---------- ----------                                      
+         1 02-SEP-17         23         15                                      
+         2 02-SEP-17        102         15                                      
+         3 02-SEP-17        154         21                                      
+         4 03-SEP-17         83         30                                      
+         5 03-SEP-17         23         15                                      
+         6 04-SEP-17         83         12                                      
+         7 04-SEP-17        154         15                                      
+         8 05-SEP-17         53         12                                      
+         9 05-SEP-17         68         15                                      
+        10 05-SEP-17         23         21                                      
+        11 05-SEP-17         72         42                                      
+
+11 rows selected.
+
+SQL> SELECT * FROM Fee_htr;
+
+F     FEEAMT                                                                    
+- ----------                                                                    
+A          3                                                                    
+B          2                                                                    
+
+SQL> SELECT * FROM Genre_htr;
+
+GE GENREDESC                                                                    
+-- ---------------                                                              
+AC Action                                                                       
+CL Classics                                                                     
+FM Family                                                                       
+HR Horror                                                                       
+DR Drama                                                                        
+
+SQL> SELECT * FROM Rating_htr;
+
+RATING RATINGDESC                                                               
+------ ------------------------------                                           
+R      Restricted Under 17                                                      
+PG-13  Inappropriate Under 13                                                   
+PG     Parental Guidance                                                        
+NR     Not Rated                                                                
+
+SQL> SELECT * FROM Title_htr
+  2  	     ORDER BY TitleID;
+
+   TITLEID TITLE                                    RATING GE                   
+---------- ---------------------------------------- ------ --                   
+        12 Casa Blanca                              PG     CL                   
+        29 Despicable Me 2                          PG     FM                   
+        35 Minions                                  PG     FM                   
+        42 Frozen                                   PG     FM                   
+        58 The Specialist                           R      AC                   
+        76 Avengers: Infinity War                   PG-13  AC                   
+        92 Hacksaw Ridge                            R      AC                   
+       119 Insurgent                                PG-13  AC                   
+       159 Boss Baby                                PG     FM                   
+       218 Gone With The Wind                       PG     CL                   
+       230 Lone Survivor                            R      AC                   
+
+   TITLEID TITLE                                    RATING GE                   
+---------- ---------------------------------------- ------ --                   
+       240 It                                       R      HR                   
+       245 Moana                                    PG     FM                   
+       279 Hidalgo                                  PG-13  DR                   
+       296 The Hurt Locker                          R      AC                   
+
+15 rows selected.
+
+SQL> SELECT * FROM Format_htr;
+
+F FORMATDESC                                                                    
+- ----------                                                                    
+D DVD                                                                           
+B BLU-RAY                                                                       
+
+SQL> SELECT * FROM Disk_htr
+  2  	     ORDER BY DiskID;
+
+    DISKID    TITLEID F                                                         
+---------- ---------- -                                                         
+        86         58 B                                                         
+        89         12 D                                                         
+        96         29 D                                                         
+        97         29 D                                                         
+       152         42 D                                                         
+       153         42 D                                                         
+       191         76 D                                                         
+       202        159 D                                                         
+       203        159 D                                                         
+       215         92 D                                                         
+       216         92 B                                                         
+
+    DISKID    TITLEID F                                                         
+---------- ---------- -                                                         
+       259        119 B                                                         
+       260        119 D                                                         
+       299         35 D                                                         
+       301        230 B                                                         
+       327         92 D                                                         
+       376        245 B                                                         
+       381        218 D                                                         
+       382        119 B                                                         
+       402        240 B                                                         
+       406         29 D                                                         
+       421        296 D                                                         
+
+22 rows selected.
+
+SQL> SELECT * FROM RentalDetail_htr
+  2  	     ORDER BY RentalID;
+
+  RENTALID     DISKID F                                                         
+---------- ---------- -                                                         
+         1        215 B                                                         
+         1        191 B                                                         
+         2        259 A                                                         
+         3         96 B                                                         
+         3         89 B                                                         
+         3        152 B                                                         
+         4         86 A                                                         
+         5        260 A                                                         
+         6        301 A                                                         
+         7        153 B                                                         
+         7        376 A                                                         
+
+  RENTALID     DISKID F                                                         
+---------- ---------- -                                                         
+         8        202 B                                                         
+         8        402 A                                                         
+         9        216 A                                                         
+         9        381 A                                                         
+        10         97 A                                                         
+        10        203 B                                                         
+        11        299 A                                                         
+        11        376 B                                                         
+        11        421 A                                                         
+        12        376 A                                                         
+        12        406 B                                                         
+
+  RENTALID     DISKID F                                                         
+---------- ---------- -                                                         
+        13        382 A                                                         
+        13        215 B                                                         
+        13        327 A                                                         
+
+25 rows selected.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> SET echo OFF

@@ -1,0 +1,648 @@
+SQL> 
+SQL> --Howard Rohrig
+SQL> --Project 3
+SQL> 
+SQL> COLUMN FeeCode FORMAT A8
+SQL> COLUMN RentalDate FORMAT A12
+SQL> COLUMN GenreID FORMAT A8
+SQL> COLUMN RatingID FORMAT A10
+SQL> COLUMN FormatCode FORMAT A12
+SQL> COLUMN CustPhone FORMAT A15
+SQL> 
+SQL> SET LINESIZE 100
+SQL> SET PAGESIZE 100
+SQL> 
+SQL> --1
+SQL> INSERT INTO Fee_htr VALUES('C',2.50);
+
+1 row created.
+
+SQL> 
+SQL> --2
+SQL> UPDATE RentalDetail_htr
+  2  	     SET FeeCode = 'A'
+  3  	     WHERE DiskID = 191 AND RentalID = 1;
+
+1 row updated.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> --3
+SQL> UPDATE RentalDetail_htr
+  2  	     SET FeeCode = 'C'
+  3  	     WHERE DiskID = 421 AND RentalID = 11;
+
+1 row updated.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> --4
+SQL> ALTER TABLE Rating_htr
+  2  	     MODIFY RatingDesc VARCHAR(50);
+
+Table altered.
+
+SQL> 
+SQL> UPDATE Rating_htr
+  2  	     SET RatingDesc = 'May Not be Suitable for Children Under 13'
+  3  	     WHERE RatingID = 'PG-13';
+
+1 row updated.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> --5
+SQL> INSERT INTO Customer_htr VALUES((SELECT MAX(CustID) FROM Customer_htr)+1,
+  2  	     'Mary','Jones','2145552020');
+
+1 row created.
+
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> 
+SQL> --6
+SQL> SELECT CustID,CustFName,CustLName FROM Customer_htr
+  2  	     WHERE CustPhone is NULL
+  3  	     ORDER BY CustID;
+
+    CUSTID CUSTFNAME            CUSTLNAME                                                           
+---------- -------------------- --------------------                                                
+        68 Anthony              Smith                                                               
+        83 Kerry                Brown                                                               
+       100 Amanda               Green                                                               
+
+SQL> 
+SQL> --7
+SQL> SELECT AVG(FeeAmt) AS "AvgFee" FROM Fee_htr;
+
+    AvgFee                                                                                          
+----------                                                                                          
+       2.5                                                                                          
+
+SQL> 
+SQL> --8
+SQL> SELECT COUNT(DISTINCT TitleID) AS "TitleCount" FROM Disk_htr;
+
+TitleCount                                                                                          
+----------                                                                                          
+        14                                                                                          
+
+SQL> 
+SQL> --9
+SQL> SELECT GenreID AS "GenreID", COUNT(TitleID) AS "TitleCount"
+  2  	     FROM Title_htr
+  3  	     GROUP BY GenreID;
+
+GenreID  TitleCount                                                                                 
+-------- ----------                                                                                 
+AC                6                                                                                 
+FM                5                                                                                 
+HR                1                                                                                 
+CL                2                                                                                 
+DR                1                                                                                 
+
+SQL> 
+SQL> --10
+SQL> SELECT RD.RentalID AS "RentalID", RentalDate AS "Date", TO_CHAR(SUM(FeeAmt), '$999,999.99') AS "RentalTotal"
+  2  	     FROM Rental_htr R, RentalDetail_htr RD, Fee_htr F
+  3  	     WHERE RD.RentalID = R.RentalID AND RD.RentalID = 10
+  4  	     GROUP BY RD.RentalID, RentalDate;
+
+  RentalID Date      RentalTotal                                                                    
+---------- --------- ------------                                                                   
+        10 05-SEP-17       $15.00                                                                   
+
+SQL> 
+SQL> --11(A)
+SQL> SELECT R.CustID AS "CustomerID", CustFName || ' ' || CustLName AS "CustomerName", COUNT(RentalID) AS "RentalCount"
+  2  	     FROM Rental_htr R, Customer_htr C
+  3  	     WHERE R.CustID = C.CustID
+  4  	     GROUP BY R.CustID, CustFName, CustLName
+  5  	     ORDER BY "RentalCount" DESC, R.CustID;
+
+CustomerID CustomerName                              RentalCount                                    
+---------- ----------------------------------------- -----------                                    
+        23 Jean Mackey                                         3                                    
+        83 Kerry Brown                                         2                                    
+       154 Alicia Moore                                        2                                    
+        53 Ashleigh Hayes                                      1                                    
+        68 Anthony Smith                                       1                                    
+        72 Shane Wesley                                        1                                    
+       102 Jack Hughes                                         1                                    
+
+7 rows selected.
+
+SQL> 
+SQL> --11(B)
+SQL> SELECT RentalID AS "RentalID", DiskID AS "DiskID", FeeCode AS "FeeCode"
+  2  	     FROM RentalDetail_htr
+  3  	     ORDER BY RentalID, DiskID;
+
+  RentalID     DiskID FeeCode                                                                       
+---------- ---------- --------                                                                      
+         1        191 A                                                                             
+         1        215 B                                                                             
+         2        259 A                                                                             
+         3         89 B                                                                             
+         3         96 B                                                                             
+         3        152 B                                                                             
+         4         86 A                                                                             
+         5        260 A                                                                             
+         6        301 A                                                                             
+         7        153 B                                                                             
+         7        376 A                                                                             
+         8        202 B                                                                             
+         8        402 A                                                                             
+         9        216 A                                                                             
+         9        381 A                                                                             
+        10         97 A                                                                             
+        10        203 B                                                                             
+        11        299 A                                                                             
+        11        376 B                                                                             
+        11        421 C                                                                             
+        12        376 A                                                                             
+        12        406 B                                                                             
+        13        215 B                                                                             
+        13        327 A                                                                             
+        13        382 A                                                                             
+
+25 rows selected.
+
+SQL> 
+SQL> --12
+SQL> SELECT D.TitleID AS "TitleID", Title AS "Title", COUNT(FormatCode) AS "Formats"
+  2  	     FROM Disk_htr D, Title_htr T
+  3  	     WHERE D.TitleID = T.TitleID
+  4  	     GROUP BY D.TitleID, Title
+  5  	     ORDER BY "Formats" DESC;
+
+   TitleID Title                                       Formats                                      
+---------- ---------------------------------------- ----------                                      
+        29 Despicable Me 2                                   3                                      
+        92 Hacksaw Ridge                                     3                                      
+       119 Insurgent                                         3                                      
+        42 Frozen                                            2                                      
+       159 Boss Baby                                         2                                      
+       240 It                                                1                                      
+        58 The Specialist                                    1                                      
+       218 Gone With The Wind                                1                                      
+        35 Minions                                           1                                      
+        76 Avengers: Infinity War                            1                                      
+        12 Casa Blanca                                       1                                      
+       296 The Hurt Locker                                   1                                      
+       245 Moana                                             1                                      
+       230 Lone Survivor                                     1                                      
+
+14 rows selected.
+
+SQL> 
+SQL> --13
+SQL> SELECT CustID AS "Customer_ID", CustFName AS "First_Name", CustLName AS "Last_Name",
+  2  ('(' || SUBSTR(CustPhone, 1,3) || ')' || SUBSTR(CustPhone, 4,3) || '-' || SUBSTR(CustPhone, 7,4)) AS "Phone"
+  3  	     FROM Customer_htr
+  4  	     ORDER BY CustID;
+
+Customer_ID First_Name           Last_Name            Phone                                         
+----------- -------------------- -------------------- -------------------------------------------   
+         23 Jean                 Mackey               (214)688-1234                                 
+         53 Ashleigh             Hayes                (972)555-0628                                 
+         68 Anthony              Smith                ()-                                           
+         72 Shane                Wesley               (817)555-0112                                 
+         83 Kerry                Brown                ()-                                           
+        100 Amanda               Green                ()-                                           
+        102 Jack                 Hughes               (214)555-2014                                 
+        154 Alicia               Moore                (817)555-1919                                 
+        155 Mary                 Jones                (214)555-2020                                 
+
+9 rows selected.
+
+SQL> 
+SQL> --14
+SQL> SELECT RD.RentalID AS "RentalID", T.GenreID AS "GenreID", GenreDesc AS "Genre", D.TitleID AS "TitleID",
+  2  Title AS "Title", TO_CHAR(FeeAmt, '$999.99') AS "Fee"
+  3  	     FROM RentalDetail_htr RD, Disk_htr D, Title_htr T, Genre_htr G, Fee_htr F
+  4  	     WHERE RD.DiskID = D.DiskID AND
+  5  			     D.TitleID = T.TitleID AND
+  6  			     T.GenreID = G.GenreID AND
+  7  			     (RentalID, FeeAmt) IN
+  8  			     (SELECT RentalID, MIN(FeeAmt)
+  9  				     FROM RentalDetail_htr RD, Fee_htr F
+ 10  				     WHERE RD.FeeCode = F.FeeCode
+ 11  				     GROUP BY RentalID)
+ 12  	     ORDER BY "Fee" DESC;
+
+  RentalID GenreID  Genre              TitleID Title                                    Fee         
+---------- -------- --------------- ---------- ---------------------------------------- --------    
+         4 AC       Action                  58 The Specialist                              $3.00    
+         9 AC       Action                  92 Hacksaw Ridge                               $3.00    
+         2 AC       Action                 119 Insurgent                                   $3.00    
+         5 AC       Action                 119 Insurgent                                   $3.00    
+         6 AC       Action                 230 Lone Survivor                               $3.00    
+         9 CL       Classics               218 Gone With The Wind                          $3.00    
+         3 FM       Family                  42 Frozen                                      $2.00    
+         1 AC       Action                  76 Avengers: Infinity War                      $2.00    
+        13 AC       Action                  92 Hacksaw Ridge                               $2.00    
+         1 AC       Action                  92 Hacksaw Ridge                               $2.00    
+        13 AC       Action                  92 Hacksaw Ridge                               $2.00    
+        13 AC       Action                 119 Insurgent                                   $2.00    
+        10 FM       Family                 159 Boss Baby                                   $2.00    
+         8 FM       Family                 159 Boss Baby                                   $2.00    
+         8 HR       Horror                 240 It                                          $2.00    
+         7 FM       Family                 245 Moana                                       $2.00    
+        11 FM       Family                 245 Moana                                       $2.00    
+        12 FM       Family                 245 Moana                                       $2.00    
+         7 FM       Family                  42 Frozen                                      $2.00    
+        11 FM       Family                  35 Minions                                     $2.00    
+         3 FM       Family                  29 Despicable Me 2                             $2.00    
+        10 FM       Family                  29 Despicable Me 2                             $2.00    
+        11 AC       Action                 296 The Hurt Locker                             $2.00    
+         3 CL       Classics                12 Casa Blanca                                 $2.00    
+        12 FM       Family                  29 Despicable Me 2                             $2.00    
+
+25 rows selected.
+
+SQL> 
+SQL> --15
+SQL> 	     SELECT GenreDesc AS "Genre", Title AS "Title", R.RatingID AS "Rating"
+  2  		     FROM Genre_htr G, Title_htr T, Rating_htr R
+  3  		     WHERE T.GenreID = G.GenreID AND
+  4  			     T.RatingID = R.RatingID
+  5  		     ORDER BY GenreDesc, Title;
+
+Genre           Title                                    Rating                                     
+--------------- ---------------------------------------- ------                                     
+Action          Avengers: Infinity War                   PG-13                                      
+Action          Hacksaw Ridge                            R                                          
+Action          Insurgent                                PG-13                                      
+Action          Lone Survivor                            R                                          
+Action          The Hurt Locker                          R                                          
+Action          The Specialist                           R                                          
+Classics        Casa Blanca                              PG                                         
+Classics        Gone With The Wind                       PG                                         
+Drama           Hidalgo                                  PG-13                                      
+Family          Boss Baby                                PG                                         
+Family          Despicable Me 2                          PG                                         
+Family          Frozen                                   PG                                         
+Family          Minions                                  PG                                         
+Family          Moana                                    PG                                         
+Horror          It                                       R                                          
+
+15 rows selected.
+
+SQL> 
+SQL> --16
+SQL> 	     SELECT GenreDesc AS "GenreName", COUNT(TitleID) AS "TitleCount"
+  2  		     FROM Genre_htr G, Title_htr T
+  3  		     WHERE T.GenreID = G.GenreID
+  4  		     GROUP BY GenreDesc
+  5  		     ORDER BY "TitleCount" DESC;
+
+GenreName       TitleCount                                                                          
+--------------- ----------                                                                          
+Action                   6                                                                          
+Family                   5                                                                          
+Classics                 2                                                                          
+Horror                   1                                                                          
+Drama                    1                                                                          
+
+SQL> 
+SQL> --17
+SQL> 	     SELECT RentalID AS "Rental_ID", RD.DiskID AS "Disk_ID", Title AS "Title", TO_CHAR(FeeAmt, '$999.99') AS "FeeAmt"
+  2  		     FROM RentalDetail_htr RD, Disk_htr D, Title_htr T, Fee_htr F
+  3  		     WHERE RD.DiskID = D.DiskID AND
+  4  			     D.TitleID = T.TitleID AND
+  5  			     RD.FeeCode = F.FeeCode AND
+  6  			     FeeAmt <=2.50
+  7  		     ORDER BY "FeeAmt" DESC, Title;
+
+ Rental_ID    Disk_ID Title                                    FeeAmt                               
+---------- ---------- ---------------------------------------- --------                             
+        11        421 The Hurt Locker                             $2.50                             
+         8        202 Boss Baby                                   $2.00                             
+        10        203 Boss Baby                                   $2.00                             
+         3         89 Casa Blanca                                 $2.00                             
+        12        406 Despicable Me 2                             $2.00                             
+         3         96 Despicable Me 2                             $2.00                             
+         7        153 Frozen                                      $2.00                             
+         3        152 Frozen                                      $2.00                             
+        13        215 Hacksaw Ridge                               $2.00                             
+         1        215 Hacksaw Ridge                               $2.00                             
+        11        376 Moana                                       $2.00                             
+
+11 rows selected.
+
+SQL> 
+SQL> --18
+SQL> 	     SELECT RD.RentalID AS "Rental_ID", TO_CHAR(RentalDate, 'mm-dd-yyyy') AS "RentalDate", R.CustID AS "Cust_ID", CustFName AS "First Name",
+  2  			CustLName AS "Last Name", COUNT(DiskID) AS "Count"
+  3  		     FROM RentalDetail_htr RD, Rental_htr R, Customer_htr C
+  4  		     WHERE RD.RentalID = R.RentalID AND
+  5  			     R.CustID = C.CustID
+  6  		     GROUP BY RD.RentalID,RentalDate,R.CustID,CustFName,CustLName;
+
+ Rental_ID RentalDate      Cust_ID First Name           Last Name                 Count             
+---------- ------------ ---------- -------------------- -------------------- ----------             
+         3 09-02-2017          154 Alicia               Moore                         3             
+         7 09-04-2017          154 Alicia               Moore                         2             
+         4 09-03-2017           83 Kerry                Brown                         1             
+         9 09-05-2017           68 Anthony              Smith                         2             
+        11 09-05-2017           72 Shane                Wesley                        3             
+         1 09-02-2017           23 Jean                 Mackey                        2             
+         8 09-05-2017           53 Ashleigh             Hayes                         2             
+        10 09-05-2017           23 Jean                 Mackey                        2             
+         2 09-02-2017          102 Jack                 Hughes                        1             
+         5 09-03-2017           23 Jean                 Mackey                        1             
+         6 09-04-2017           83 Kerry                Brown                         1             
+
+11 rows selected.
+
+SQL> 		     ORDER BY RD.RentalID
+SP2-0734: unknown command beginning "ORDER BY R..." - rest of line ignored.
+SQL> 
+SQL> --19
+SQL> 	     SELECT RD.RentalID AS "Rental_ID", D.DiskID AS "DiskID", Title AS "Title", T.RatingID AS "Rating",
+  2  			FormatDesc AS "Format", TO_CHAR(FeeAmt, '$999.99') AS "Fee"
+  3  		     FROM RentalDetail_htr RD, Disk_htr D, Title_htr T, Format_htr F, Fee_htr FE
+  4  		     WHERE RD.DiskID = D.DiskID AND
+  5  			     D.TitleID = T.TitleID AND
+  6  			     D.FormatCode = F.FormatCode AND
+  7  			     RD.FeeCode = FE.FeeCode AND
+  8  			     RentalID = 3;
+
+ Rental_ID     DiskID Title                                    Rating Format     Fee                
+---------- ---------- ---------------------------------------- ------ ---------- --------           
+         3         89 Casa Blanca                              PG     DVD           $2.00           
+         3         96 Despicable Me 2                          PG     DVD           $2.00           
+         3        152 Frozen                                   PG     DVD           $2.00           
+
+SQL> 
+SQL> --20
+SQL> 	     SELECT T.RatingID AS "Rating_ID", RatingDesc AS "Rating", COUNT(TitleID) AS "Count"
+  2  		     FROM Title_htr T, Rating_htr R
+  3  		     WHERE T.RatingID = R.RatingID
+  4  		     GROUP BY T.RatingID, RatingDesc;
+
+Rating Rating                                                  Count                                
+------ -------------------------------------------------- ----------                                
+PG     Parental Guidance                                           7                                
+R      Restricted Under 17                                         5                                
+PG-13  May Not be Suitable for Children Under 13                   3                                
+
+SQL> 
+SQL> --21
+SQL> 	     SELECT RentalID AS "Rental_ID", RD.DiskID AS "Disk_ID", Title AS "Title", GenreDesc AS "Genre",
+  2  			RD.FeeCode AS "Fee_Code", FeeAmt AS "Fee"
+  3  		     FROM RentalDetail_htr RD, Disk_htr D, Title_htr T, Genre_htr G, Fee_htr F
+  4  		     WHERE RD.DiskID = D.DiskID AND
+  5  			     D.TitleID = T.TitleID AND
+  6  			     T.GenreID = G.GenreID AND
+  7  			     RD.FeeCode = F.FeeCode AND
+  8  			     FeeAmt > (SELECT AVG(FeeAmt) FROM Fee_htr F, RentalDetail_htr RD
+  9  						     WHERE RD.FeeCode = F.FeeCode)
+ 10  			     ORDER BY Title;
+
+ Rental_ID    Disk_ID Title                                    Genre           F        Fee         
+---------- ---------- ---------------------------------------- --------------- - ----------         
+         1        191 Avengers: Infinity War                   Action          A          3         
+        10         97 Despicable Me 2                          Family          A          3         
+         9        381 Gone With The Wind                       Classics        A          3         
+        13        327 Hacksaw Ridge                            Action          A          3         
+         9        216 Hacksaw Ridge                            Action          A          3         
+         2        259 Insurgent                                Action          A          3         
+        13        382 Insurgent                                Action          A          3         
+         5        260 Insurgent                                Action          A          3         
+         8        402 It                                       Horror          A          3         
+         6        301 Lone Survivor                            Action          A          3         
+        11        299 Minions                                  Family          A          3         
+        12        376 Moana                                    Family          A          3         
+         7        376 Moana                                    Family          A          3         
+         4         86 The Specialist                           Action          A          3         
+
+14 rows selected.
+
+SQL> 
+SQL> --22
+SQL> 	     SELECT DISTINCT(D.TitleID) AS "Title_ID", Title AS "Title", GenreDesc AS "Genre", T.RatingID AS "Rating_ID"
+  2  		     FROM RentalDetail_htr RD, Disk_htr D, Title_htr T, Genre_htr G, Rating_htr R
+  3  		     WHERE RD.DiskID = D.DiskID AND
+  4  			     D.TitleID = T.TitleID AND
+  5  			     T.GenreID = G.GenreID AND
+  6  			     T.RatingID = R.RatingID AND
+  7  			     RD.FeeCode = 'B'
+  8  		     ORDER BY Title;
+
+  Title_ID Title                                    Genre           Rating                          
+---------- ---------------------------------------- --------------- ------                          
+       159 Boss Baby                                Family          PG                              
+        12 Casa Blanca                              Classics        PG                              
+        29 Despicable Me 2                          Family          PG                              
+        42 Frozen                                   Family          PG                              
+        92 Hacksaw Ridge                            Action          R                               
+       245 Moana                                    Family          PG                              
+
+6 rows selected.
+
+SQL> 
+SQL> --23
+SQL> 	     SELECT RD.RentalID AS "RentalID", TO_CHAR(RentalDate, 'mm/dd/yy') AS "Date", TO_CHAR(SUM(FeeAmt), '$999.99') AS "Fee"
+  2  		     FROM RentalDetail_htr RD,Rental_htr R, Fee_htr F
+  3  		     WHERE RD.RentalID = R.RentalID AND
+  4  			     RD.FeeCode = F.FeeCode AND
+  5  			     RD.RentalID = 3
+  6  		     GROUP BY RD.RentalID, RentalDate;
+
+  RentalID Date     Fee                                                                             
+---------- -------- --------                                                                        
+         3 09/02/17    $6.00                                                                        
+
+SQL> 
+SQL> --24
+SQL> 	     SELECT RD.DiskID AS "DiskID", D.TitleID AS "TitleID", Title AS "Title", RD.FeeCode AS "FeeCode",
+  2  			TO_CHAR(FeeAmt, '$999.99') AS "FeeAmt"
+  3  		     FROM RentalDetail_htr RD, Disk_htr D, Title_htr T, Fee_htr F
+  4  		     WHERE RD.DiskID = D.DiskID AND
+  5  			     D.TitleID = T.TitleID AND
+  6  			     RD.FeeCode = F.FeeCode AND
+  7  			     RentalID = 10 AND
+  8  			     FeeAmt IN (SELECT MAX(FeeAmt) FROM Fee_htr);
+
+    DiskID    TitleID Title                                    FeeCode  FeeAmt                      
+---------- ---------- ---------------------------------------- -------- --------                    
+        97         29 Despicable Me 2                          A           $3.00                    
+
+SQL> 
+SQL> --25
+SQL> 	     SELECT RentalID AS "Rental_ID", RentalDate AS "Date", R.CustID AS "Customer_ID", CustLName AS "Customer LName",
+  2  			R.ClerkID AS "Clerk_ID", ClerkLName AS "Clerk LName"
+  3  		     FROM Rental_htr R, Customer_htr C, Clerk_htr CL
+  4  		     WHERE  R.CustID = C.CustID AND
+  5  			     R.ClerkID = CL.ClerkID AND
+  6  			     RentalDate < '05-SEP-2017'
+  7  		     ORDER BY RentalDate, RentalID;
+
+ Rental_ID Date      Customer_ID Customer LName         Clerk_ID Clerk LName                        
+---------- --------- ----------- -------------------- ---------- --------------------               
+         1 02-SEP-17          23 Mackey                       15 Jones                              
+         2 02-SEP-17         102 Hughes                       15 Jones                              
+         3 02-SEP-17         154 Moore                        21 White                              
+         4 03-SEP-17          83 Brown                        30 Smith                              
+         5 03-SEP-17          23 Mackey                       15 Jones                              
+         6 04-SEP-17          83 Brown                        12 Shore                              
+         7 04-SEP-17         154 Moore                        15 Jones                              
+
+7 rows selected.
+
+SQL> 
+SQL> --26
+SQL> 	     SELECT RD.DiskID AS "Disk_ID", D.TitleID AS "Title_ID", Title AS "Title", FeeAmt AS "Fee"
+  2  		     FROM RentalDetail_htr RD, Disk_htr D, Title_htr T, Fee_htr F
+  3  		     WHERE RD.DiskID = D.DiskID AND
+  4  			     D.TitleID = T.TitleID AND
+  5  			     RD.FeeCode = F.FeeCode AND
+  6  			     FeeAmt > (SELECT AVG(FeeAmt) FROM Fee_htr)
+  7  		     ORDER BY FeeAmt DESC, RD.DiskID;
+
+   Disk_ID   Title_ID Title                                           Fee                           
+---------- ---------- ---------------------------------------- ----------                           
+        86         58 The Specialist                                    3                           
+        97         29 Despicable Me 2                                   3                           
+       191         76 Avengers: Infinity War                            3                           
+       216         92 Hacksaw Ridge                                     3                           
+       259        119 Insurgent                                         3                           
+       260        119 Insurgent                                         3                           
+       299         35 Minions                                           3                           
+       301        230 Lone Survivor                                     3                           
+       327         92 Hacksaw Ridge                                     3                           
+       376        245 Moana                                             3                           
+       376        245 Moana                                             3                           
+       381        218 Gone With The Wind                                3                           
+       382        119 Insurgent                                         3                           
+       402        240 It                                                3                           
+
+14 rows selected.
+
+SQL> 
+SQL> --27
+SQL> 	     SELECT R.CustID AS "Customer_ID", CustFName || ' ' || CustLName AS "Customer_Name", TO_CHAR(SUM(FeeAmt), '$999.99') AS "FeeAmt"
+  2  		     FROM RentalDetail_htr RD, Rental_htr R, Customer_htr C, Fee_htr F
+  3  		     WHERE RD.RentalID = R.RentalID AND
+  4  			     R.CustID = C.CustID AND
+  5  			     RD.FeeCode = F.FeeCode AND
+  6  			     R.CustID = 23
+  7  		     GROUP BY R.CustID, CustFName, CustLName;
+
+Customer_ID Customer_Name                             FeeAmt                                        
+----------- ----------------------------------------- --------                                      
+         23 Jean Mackey                                 $13.00                                      
+
+SQL> 
+SQL> --28
+SQL> 	     SELECT RD.RentalID AS "RentalID", TO_CHAR(RentalDate, 'mm/dd/yy') AS "Date", R.CustID AS "CustID",
+  2  			CustFName AS "First Name", CustLName AS "Last Name",
+  3  			('(' || SUBSTR(CustPhone, 1,3) || ')' || SUBSTR(CustPhone, 4,3) || '-' || SUBSTR(CustPhone, 7,4)) AS "Phone"
+  4  		     FROM RentalDetail_htr RD, Rental_htr R, Customer_htr C
+  5  		     WHERE RD.RentalID = R.RentalID AND
+  6  			       R.CustID = C.CustID AND
+  7  			       RentalDate <= '04-SEP-2017'
+  8  		     ORDER BY RentalDate, R.CustID;
+
+  RentalID Date         CustID First Name           Last Name                                       
+---------- -------- ---------- -------------------- --------------------                            
+Phone                                                                                               
+-------------------------------------------                                                         
+         1 09/02/17         23 Jean                 Mackey                                          
+(214)688-1234                                                                                       
+                                                                                                    
+         1 09/02/17         23 Jean                 Mackey                                          
+(214)688-1234                                                                                       
+                                                                                                    
+         2 09/02/17        102 Jack                 Hughes                                          
+(214)555-2014                                                                                       
+                                                                                                    
+         3 09/02/17        154 Alicia               Moore                                           
+(817)555-1919                                                                                       
+                                                                                                    
+         3 09/02/17        154 Alicia               Moore                                           
+(817)555-1919                                                                                       
+                                                                                                    
+         3 09/02/17        154 Alicia               Moore                                           
+(817)555-1919                                                                                       
+                                                                                                    
+         5 09/03/17         23 Jean                 Mackey                                          
+(214)688-1234                                                                                       
+                                                                                                    
+         4 09/03/17         83 Kerry                Brown                                           
+()-                                                                                                 
+                                                                                                    
+         6 09/04/17         83 Kerry                Brown                                           
+()-                                                                                                 
+                                                                                                    
+         7 09/04/17        154 Alicia               Moore                                           
+(817)555-1919                                                                                       
+                                                                                                    
+         7 09/04/17        154 Alicia               Moore                                           
+(817)555-1919                                                                                       
+                                                                                                    
+
+11 rows selected.
+
+SQL> 
+SQL> --29
+SQL> 	     SELECT R.ClerkID AS "EmployeeID", ClerkFName AS "FirstName", ClerkLName AS "LastName", COUNT(R.ClerkID) AS "RentalCount"
+  2  		     FROM Rental_htr R, Clerk_htr C
+  3  		     WHERE R.ClerkID = C.ClerkID
+  4  		     HAVING COUNT(R.ClerkID) > 1
+  5  		     GROUP BY R.ClerkID, ClerkFName, ClerkLName
+  6  		     ORDER BY "RentalCount" DESC, "EmployeeID";
+
+EmployeeID FirstName            LastName             RentalCount                                    
+---------- -------------------- -------------------- -----------                                    
+        15 Mary                 Jones                          5                                    
+        12 Tim                  Shore                          2                                    
+        21 Mark                 White                          2                                    
+
+SQL> 
+SQL> --30
+SQL> 	     SELECT CustID AS "Customer_ID", CustFName AS "First_Name", CustLName AS "Last_Name"
+  2  		     FROM Customer_htr F
+  3  		     WHERE CustFName LIKE 'J%' OR CustLName LIKE 'J%'
+  4  		     ORDER BY "Last_Name";
+
+Customer_ID First_Name           Last_Name                                                          
+----------- -------------------- --------------------                                               
+        102 Jack                 Hughes                                                             
+        155 Mary                 Jones                                                              
+         23 Jean                 Mackey                                                             
+
+SQL> 
+SQL> --31
+SQL> 	     SELECT CustID AS "CustID", CustFName AS "FirstName", CustLName AS "LastName"
+  2  		     FROM Customer_htr
+  3  		     WHERE CustID NOT IN (SELECT CustID FROM Rental_htr);
+
+    CustID FirstName            LastName                                                            
+---------- -------------------- --------------------                                                
+       100 Amanda               Green                                                               
+       155 Mary                 Jones                                                               
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> SET echo OFF
